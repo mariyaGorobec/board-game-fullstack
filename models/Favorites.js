@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const DrawerSchema = new mongoose.Schema({
+const FavoritesSchema = new mongoose.Schema({
     
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -16,4 +16,4 @@ const DrawerSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-export default mongoose.model('Drawer', DrawerSchema);
+export default mongoose.model('Favorites', FavoritesSchema);

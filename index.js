@@ -1,15 +1,14 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
+import multer from 'multer';
 import mongoose from 'mongoose';
-import {validationResult} from 'express-validator';
-import bcrypt from 'bcrypt';
 
-import {registerValidation, loginValidation} from './validations/validations.js';
-import UserModel from './models/User.js';
+
+import {registerValidation, loginValidation, boardGameCreateValidation} from './validations/validations.js';
 import checkAuth from './utils/checkAuth.js';
-import User from './models/User.js';
-
-import {register, login, getMe} from './controllers/UserController.js'
+import * as UserController from './controllers/UserController.js'
+import * as BoardGameController from './controllers/BoardGameController.js'
+import checkAuthAdmin from './utils/checkAuthAdmin.js';
+import handleValidationErrors from './utils/handleValidationErrors.js';
 
 mongoose
   .connect(
@@ -20,16 +19,42 @@ mongoose
 
 const app = express();
 
+const storage = multer.diskStorage({
+  destination: (_,__,cb)=>{
+    cb(null, "uploads");
+  },
+  filename:(_,file,cb)=>{
+    cb(null, file.originalname);
+  }
+});
+
+const upload = multer({storage});
+
 app.use(express.json());
+app.uses('/uploads',express.static('uploads'));
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-app.post('/auth/login',loginValidation, login);
 
-app.post('/auth/register', registerValidation,register);
-app.get('/auth/me', checkAuth, getMe);
+app.post('/auth/login',loginValidation, handleValidationErrors,UserController.login);
+app.post('/auth/register', registerValidation, handleValidationErrors,UserController.register);
+app.get('/auth/me', checkAuth, UserController.getMe);
+
+app.post('/uploads',checkAuthAdmin,upload.single('image'), (req,res)=>
+{
+  res.json({
+    url: `uploads/${req.file.originalname},`
+  });
+});
+
+app.get('/games',BoardGameController.getAll);
+app.get('/games/:id',BoardGameController.getOne);
+app.post('/games', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,BoardGameController.create);
+app.delete('/games/:id', checkAuthAdmin,BoardGameController.remove);
+app.patch('/games/:id', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,BoardGameController.update);
+
 
 app.listen(4444, (err)=>{
     if(err){
