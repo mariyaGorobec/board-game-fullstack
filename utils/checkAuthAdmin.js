@@ -5,7 +5,7 @@ export default (req,res,next)=>{
     if (token){
         try{
             const decoded = jwt.verify(token, 'secret123');
-            if (decoded._id==="63f9b1ca3f099d7ef031c895"){
+            if (decoded.role===true){
                 req.userId = decoded._id;
             }
             else{

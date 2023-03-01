@@ -1,8 +1,9 @@
-import BoardGame from "../models/BoardGame.js";
+
+import Product from "../models/Product.js";
 
 export const getAll = async (req, res) => {
   try {
-    const games = await BoardGame.find();
+    const games = await Product.find();
 
     res.json(games);
   } catch (err) {
@@ -17,7 +18,7 @@ export const getOne = async (req, res) => {
   try {
     const gameId = req.params.id;
 
-    BoardGame.findOne(
+    Product.findOne(
       {
         _id: gameId,
       },
@@ -48,7 +49,7 @@ export const remove = async (req, res) => {
     try {
       const gameId = req.params.id;
   
-      BoardGame.findOneAndDelete({
+      Product.findOneAndDelete({
             _id: gameId,
       }, (err, doc)=>{
         if (err){
@@ -59,7 +60,7 @@ export const remove = async (req, res) => {
         }
         if (!doc){
             return res.status(404).json({
-                message: 'Статья не найдена'
+                message: 'Игра не найдена'
             });
         }
         res.json({
@@ -78,7 +79,8 @@ export const remove = async (req, res) => {
 
 export const create = async (req, res) => {
   try {
-    const doc = new BoardGame({
+    const doc = new Product({
+    
       title: req.body.title,
       description: req.body.description,
       price: req.body.price,
@@ -98,7 +100,7 @@ export const update = async (req, res) => {
   try {
     const gameId = req.params.id;
 
-    await BoardGame.updateOne({
+    await Product.updateOne({
       _id: gameId,
     }, {
       title: req.body.title,

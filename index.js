@@ -6,9 +6,11 @@ import mongoose from 'mongoose';
 import {registerValidation, loginValidation, boardGameCreateValidation} from './validations/validations.js';
 import checkAuth from './utils/checkAuth.js';
 import * as UserController from './controllers/UserController.js'
-import * as BoardGameController from './controllers/BoardGameController.js'
+
+import * as ProductController from './controllers/ProductController.js'
 import checkAuthAdmin from './utils/checkAuthAdmin.js';
 import handleValidationErrors from './utils/handleValidationErrors.js';
+
 
 mongoose
   .connect(
@@ -31,7 +33,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage});
 
 app.use(express.json());
-app.uses('/uploads',express.static('uploads'));
+app.use('/uploads',express.static('uploads'));
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -49,12 +51,25 @@ app.post('/uploads',checkAuthAdmin,upload.single('image'), (req,res)=>
   });
 });
 
-app.get('/games',BoardGameController.getAll);
-app.get('/games/:id',BoardGameController.getOne);
-app.post('/games', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,BoardGameController.create);
-app.delete('/games/:id', checkAuthAdmin,BoardGameController.remove);
-app.patch('/games/:id', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,BoardGameController.update);
+app.get('/games',ProductController.getAll);
+app.get('/games/:id',ProductController.getOne);
+app.post('/games', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,ProductController.create);
+app.delete('/games/:id', checkAuthAdmin,ProductController.remove);
+app.patch('/games/:id', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,ProductController.update);
 
+
+app.get('/addToCart',checkAuth,UserController.addToCart);
+app.get('/removeFromCart',checkAuth,UserController.removeFromCart);
+app.get('/cart',checkAuth,UserController.userCartInfo);
+app.get('/deleteCart',checkAuth,UserController.deleteCart);
+//app.post('/cart',CartGameController.addToCart);
+
+app.get('/addToFavorites',checkAuth,UserController.addToFavorites);
+app.get('/removeFromFavorites',checkAuth,UserController.removeFromFavorites);
+app.get('/favorites',checkAuth,UserController.userFavoritesInfo );
+
+app.get('/addToOrders',checkAuth,UserController.addToOrders);
+app.get('/orders',checkAuth,UserController.getOrders);
 
 app.listen(4444, (err)=>{
     if(err){
