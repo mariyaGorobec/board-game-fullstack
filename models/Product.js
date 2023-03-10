@@ -3,11 +3,6 @@ import User from './User.js'
 
 const ProductSchema = new mongoose.Schema({
     
-    productId:{
-        type: Schema.Types.ObjectId,
-        ref: 'Product'
-    },
-
     title: {
         type: String,
         required: true,
@@ -20,7 +15,7 @@ const ProductSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    gameImgUrl:{
+    imgURL:{
         type:String,
         required: true,
     },

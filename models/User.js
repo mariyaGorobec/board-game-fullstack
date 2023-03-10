@@ -19,6 +19,20 @@ const UserSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    addressShipping:{
+        type: String,
+        required: true,
+    },
+    localityShipping:{
+        type: String,
+        required: true,
+    },
+    
+    postcode:{
+        type: String,
+        required: true,
+    },
+
     passwordHash:{
         type: String,
         required: true,

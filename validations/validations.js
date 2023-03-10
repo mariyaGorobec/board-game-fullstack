@@ -14,5 +14,5 @@ export const boardGameCreateValidation = [
     body('title', "Введите название игры").isLength({min: 3}).isString(),
     body('description', "Введите описание игры").isLength({min: 5}).isString(),
     body('price', "Введите стоимость товара").isInt(),
-    body('gameImgUrl', "Неверная ссылка на изображение").isURL()
+    body('imgURL', "Неверная ссылка на изображение").isURL()
 ];

@@ -15,34 +15,25 @@ export const getAll = async (req, res) => {
 };
 
 export const getOne = async (req, res) => {
-  try {
-    const gameId = req.params.id;
 
-    Product.findOne(
+    const game = await Product.findById(
       {
-        _id: gameId,
+        _id: req.params.id,
       },
-      (err, doc) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).json({
-            message: "Не удалось получить игру",
-          });
-        }
-        if (!doc){
-            return res.status(404).json({
-                message: 'Игра не найдена'
-            })
-        }
-        res.json(doc);
-      }
-    );
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Не удалось получить игру",
-    });
-  }
+    )
+    if(!game){
+      return res.status(404).json({
+        message: "Игра не найдена",
+    })
+    }
+    console.log(game);
+    res.json({
+      _id:game._id,
+      title: game.title,
+      description: game.description,
+      imgURL: game.imgURL,
+      price:game.price
+  });
 };
 
 export const remove = async (req, res) => {
@@ -84,7 +75,7 @@ export const create = async (req, res) => {
       title: req.body.title,
       description: req.body.description,
       price: req.body.price,
-      gameImgUrl: req.body.gameImgUrl,
+      imgURL: req.body.imgURL,
     });
     const boardGame = await doc.save();
     res.json(boardGame);

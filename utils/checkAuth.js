@@ -7,7 +7,7 @@ export default (req,res,next)=>{
         try{
             const decoded = jwt.verify(token, 'secret123');
             //req.user = decoded._id;
-            User.findById({
+            User.findOne({
                 _id:decoded._id
             },(err,doc)=>{
                 if (err) {

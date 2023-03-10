@@ -3,8 +3,6 @@ import bcrypt from 'bcrypt';
 import {validationResult} from 'express-validator';
 import UserModel from '../models/User.js';
 import Product from '../models/Product.js';
-import { getNextKeyDef } from '@testing-library/user-event/dist/keyboard/getNextKeyDef.js';
-import User from '../models/User.js';
 
 
 
@@ -20,6 +18,9 @@ export const register = async (req,res)=>{
        name: req.body.name,
        patronymic: req.body.patronymic,
        lastName: req.body.lastName,
+       localityShipping:req.body.localityShipping,
+       addressShipping:req.body.addressShipping,
+       postcode:req.body.postcode,
        role:req.body.role,
        passwordHash: hash,
        cart: req.body.cart,
@@ -97,12 +98,12 @@ export const login = async (req,res)=>{
          });
          const {passwordHash, ...userData} = user._doc
     
-     res.json({
-        ...userData,
-        token
-     }
-     );
-    
+         
+         res.json({
+            user,
+            token
+         }
+         )
     }catch (err){console.log(err);
         res.status(500).json({
             message: 'Не удалось авторизоваться',
@@ -110,23 +111,46 @@ export const login = async (req,res)=>{
     };
 
 export const getMe =  async(req,res)=>{
-    try{
-        const user = await UserModel.findById(req.userId);
+    const token = req.body.token;
+    const decoded = jwt.decode(token, "secret123");
+    
+    const user = await UserModel.findById({
+        _id:decoded._id
+    }
+    );
+    if(!user){
+        return res.status(404).json({
+            message: "Пользователь не найден",
+        })
+    }
+  
+    res.json({
+        user
+    });
+   
+    /*try{
+        const token = req.body.token;
+        const decoded = jwt.verify(token, 'secret123');
+        const user = await UserModel.findById({
+            id:decoded._id
+        }
+        );
 
         if(!user){
             return res.status(404).json({
                 message: "Пользователь не найден",
             })
         }
-        const {passwordHash, ...userData} = user._doc
 
-        res.json(userData);
+        res.json({
+            user
+        });
     }
     catch (error){
         res.status(500).json({
             message: 'Нет доступа',
         });
-    }
+    }*/
 };
 
 export const addToCart = async(req,res,next)=>{
@@ -247,6 +271,36 @@ export const deleteCart = async(req,res)=>{
     })
 }
 
+export const deleteFavorite= async(req,res)=>{
+    UserModel.findOne({
+        _id: req.user._id
+    },
+    (err,doc)=>{
+        if (err) return res.json({
+            message: "Пользователь не найден",
+        })
+        let favorites = doc.favorites;
+        let array = favorites.map(item=> item.id);
+        doc.updateOne({
+            $pull:{
+                favorites:{
+                    'id': { $in: array }
+                }
+            }
+        },
+        {new: true},
+        (error,info)=>{
+            if(error) return res.json({
+                message: "Ошибка при удалении корзины"
+            })
+            return res.json({
+                sueccess:true
+            })
+        })
+    })
+}
+
+
 export const userCartInfo = async(req,res)=>{
     UserModel.findOne(
         {
@@ -260,14 +314,9 @@ export const userCartInfo = async(req,res)=>{
                 }
             )
 
-            Product.find({
-                '_id': {
-                    $in: array
-                }
-            });
-            return res.status(200).json({
-                sueccess:true,cart
-            })
+            return res.status(200).json(
+                array
+            )
         }
     )
 }
@@ -344,14 +393,9 @@ export const userFavoritesInfo = async(req,res)=>{
                 }
             )
 
-            Product.find({
-                '_id': {
-                    $in: array
-                }
-            });
-            return res.status(200).json({
-                sueccess:true,favorites
-            })
+            return res.status(200).json(
+                array
+            )
         }
     )
 }
@@ -427,8 +471,13 @@ export const getOrders = async(req,res)=>{
         },
         (err, userInfo)=>{
             let orders = userInfo.orders;
+            let array = orders.map(
+               item=>item.map(obj=>{
+                return obj
+               })
+            )
             return res.status(200).json({
-                sueccess:true,orders
+                array
             })
         }
     )
