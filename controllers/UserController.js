@@ -111,22 +111,12 @@ export const login = async (req,res)=>{
     };
 
 export const getMe =  async(req,res)=>{
-    const token = req.body.token;
-    const decoded = jwt.decode(token, "secret123");
-    
-    const user = await UserModel.findById({
-        _id:decoded._id
-    }
-    );
-    if(!user){
-        return res.status(404).json({
-            message: "Пользователь не найден",
+    UserModel.findOne(
+        {
+            _id: req.user._id
+        },(err,doc)=>{
+            return res.json(doc);
         })
-    }
-  
-    res.json({
-        user
-    });
    
     /*try{
         const token = req.body.token;
@@ -195,12 +185,15 @@ export const addToCart = async(req,res,next)=>{
                 {
                     new: true
                 },
-                (err,userInfo)=>{
-                    if (err) return res.json({
-                        sueccess: false, 
-                        err
-                    });
-                    res.status(200).json(userInfo.cart)
+                (err,doc)=>{
+                    
+                    Product.findOne({ _id: req.query.productId  },(error,info)=>{
+                        return res.status(200).json(
+                            
+                                info
+                            
+                        )
+                    })
                 })
             ):''
 
@@ -313,10 +306,13 @@ export const userCartInfo = async(req,res)=>{
                     return item.id
                 }
             )
+            Product.find({ '_id': { $in: array } },(error,info)=>{
+                return res.status(200).json(
+                    info
+                )
+            })
 
-            return res.status(200).json(
-                array
-            )
+            
         }
     )
 }
@@ -362,12 +358,14 @@ export const addToFavorites = async (req,res)=>{
                 {
                     new: true
                 },
-                (err,userInfo)=>{
-                    if (err) return res.json({
-                        sueccess: false, 
-                        err
-                    });
-                    res.status(200).json(userInfo.favorites)
+                (err,doc)=>{
+                    Product.findOne({ _id: req.query.productId  },(error,info)=>{
+                        return res.status(200).json(
+                            
+                                info
+                            
+                        )
+                    })
                 })
             ):''
 
@@ -393,9 +391,10 @@ export const userFavoritesInfo = async(req,res)=>{
                 }
             )
 
-            return res.status(200).json(
-                array
-            )
+            Product.find({ '_id': { $in: array } },(error,info)=>{
+                return res.status(200).json(
+                    info
+                )})
         }
     )
 }

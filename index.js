@@ -8,7 +8,7 @@ import session from 'express-session';
 import {registerValidation, loginValidation, boardGameCreateValidation} from './validations/validations.js';
 import checkAuth from './utils/checkAuth.js';
 import * as UserController from './controllers/UserController.js'
-
+import * as OrdersController from './controllers/OrdersController.js'
 import * as ProductController from './controllers/ProductController.js'
 import checkAuthAdmin from './utils/checkAuthAdmin.js';
 import handleValidationErrors from './utils/handleValidationErrors.js';
@@ -51,7 +51,7 @@ app.get('/', (req, res) => {
 
 app.post('/auth/login',loginValidation, handleValidationErrors,UserController.login);
 app.post('/auth/register', registerValidation, handleValidationErrors,UserController.register);
-app.post('/auth/me',UserController.getMe);
+app.get('/auth/me',checkAuth,UserController.getMe);
 
 app.post('/uploads',checkAuthAdmin,upload.single('image'), (req,res)=>
 {
@@ -79,8 +79,12 @@ app.get('/removeFromFavorites',checkAuth,UserController.removeFromFavorites);
 app.get('/favorites',checkAuth,UserController.userFavoritesInfo );
 app.get('/deleteFavorite',checkAuth,UserController.deleteFavorite);
 
+app.get('/makeAnOrder',checkAuth,OrdersController.makeAnOrder);
+app.get('/getOrders',checkAuth,OrdersController.getOrdersUser);
+
+
 app.get('/addToOrders',checkAuth,UserController.addToOrders);
-app.get('/orders',checkAuth,UserController.getOrders);
+//app.get('/orders',checkAuth,UserController.getOrders);
 
 app.listen(5555, (err)=>{
     if(err){
