@@ -63,8 +63,8 @@ app.post('/uploads',checkAuthAdmin,upload.single('image'), (req,res)=>
 app.get('/games',ProductController.getAll);
 app.get('/games/:id',ProductController.getOne);
 app.post('/games', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,ProductController.create);
-app.delete('/games/:id', checkAuthAdmin,ProductController.remove);
-app.patch('/games/:id', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,ProductController.update);
+app.get('/game', checkAuthAdmin,ProductController.remove);
+app.post('/gameEdit', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,ProductController.update);
 
 
 

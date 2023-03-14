@@ -1,4 +1,3 @@
-
 import Product from "../models/Product.js";
 
 export const getAll = async (req, res) => {
@@ -15,63 +14,60 @@ export const getAll = async (req, res) => {
 };
 
 export const getOne = async (req, res) => {
-
-    const game = await Product.findById(
-      {
-        _id: req.params.id,
-      },
-    )
-    if(!game){
-      return res.status(404).json({
-        message: "Игра не найдена",
-    })
-    }
-    console.log(game);
-    res.json({
-      _id:game._id,
-      title: game.title,
-      description: game.description,
-      imgURL: game.imgURL,
-      price:game.price
+  const game = await Product.findById({
+    _id: req.params.id,
+  });
+  if (!game) {
+    return res.status(404).json({
+      message: "Игра не найдена",
+    });
+  }
+  console.log(game);
+  res.json({
+    _id: game._id,
+    title: game.title,
+    description: game.description,
+    imgURL: game.imgURL,
+    price: game.price,
   });
 };
 
 export const remove = async (req, res) => {
-    try {
-      const gameId = req.params.id;
-  
-      Product.findOneAndDelete({
-            _id: gameId,
-      }, (err, doc)=>{
-        if (err){
-            console.log(err);
+  try {
+    const gameId = req.query.productId;
+
+    Product.findOneAndDelete(
+      {
+        _id: gameId,
+      },
+      (err, doc) => {
+        if (err) {
+          console.log(err);
           return res.status(500).json({
             message: "Не удалось удалить игру",
           });
         }
-        if (!doc){
-            return res.status(404).json({
-                message: 'Игра не найдена'
-            });
+        if (!doc) {
+          return res.status(404).json({
+            message: "Игра не найдена",
+          });
         }
         res.json({
-            success: true,
-        })
+          success: true,
+        });
       }
-      );
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({
-        message: "Не удалось получить игру",
-      });
-    }
-  };
-  
+    );
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось получить игру",
+    });
+  }
+};
 
 export const create = async (req, res) => {
   try {
     const doc = new Product({
-    
       title: req.body.title,
       description: req.body.description,
       price: req.body.price,
@@ -89,19 +85,25 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const gameId = req.params.id;
+    const gameId = req.body.gameId;
 
-    await Product.updateOne({
-      _id: gameId,
-    }, {
-      title: req.body.title,
-      description: req.body.description,
-      price: req.body.price,
-      gameImgUrl: req.body.gameImgUrl,
+    await Product.updateOne(
+      {
+        _id: gameId,
+      },
+      {
+        title: req.body.title,
+        description: req.body.description,
+        price: req.body.price,
+        gameImgUrl: req.body.gameImgUrl,
+      },
+      {
+        new: true,
+      }
+    )
+    return res.status(200).json({
+      success:true
     });
-    res.json({
-      success: true,
-  })
   } catch (err) {
     console.log(err);
     res.status(500).json({
