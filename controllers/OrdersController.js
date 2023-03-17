@@ -5,12 +5,19 @@ import Orders from '../models/Orders.js';
 
 
 export const makeAnOrder = async(req,res,next)=>{
-    const totalPrice = req.query.totalPrice;
+    try{
+        const totalPrice = req.query.totalPrice;
     UserModel.findOne(
         {
             _id: req.user._id
         },
         (err, userInfo)=>{
+            if (err){
+                return res.json({
+                    message:
+                      "Не удалось получить данные о пользователе",
+                  });
+            }
             let cart = userInfo.cart;
             let array = cart.map(
                 item=>{
@@ -56,6 +63,12 @@ export const makeAnOrder = async(req,res,next)=>{
                     {
                         new: true
                     },(error,userOrders)=>{
+                        if(error){
+                            return res.json({
+                                message:
+                                  "Не удалось совершить заказ",
+                              });
+                        }
                         return res.json(orderId)
                     }
                 )
@@ -64,15 +77,27 @@ export const makeAnOrder = async(req,res,next)=>{
            
         }
     )
-    
+    }
+    catch (error) {
+        res.status(500).json({
+          message: "Ошибка при оформлении заказа",
+        });
+      }
 };
 
 export const getOrdersUser = async(req,res)=>{
+  try{
     UserModel.findOne(
         {
             _id: req.user._id
         },
         (err, userInfo)=>{
+            if(err){
+                return res.json({
+                    message:
+                      "Пользователь не найден",
+                  });
+            }
             let orders = userInfo.orders;
             let array = orders.map(
                item=> {
@@ -82,11 +107,25 @@ export const getOrdersUser = async(req,res)=>{
             Orders.find({
                 _id: {$in: array}
             }, (err, doc)=>{
+                if(err){
+                    return res.json({
+                        message:
+                          "Не удалось получить данные о пользователе",
+                      });
+                }
                 return res.json(doc)
             })
         }
     )
+  }
+  catch (error) {
+    res.status(500).json({
+      message: "Ошибка при получении данных о заказах",
+    });
+  }
 }
+
+
 export const getAllOrders = async (req, res) => {
     try {
       const orders = await Orders.find();

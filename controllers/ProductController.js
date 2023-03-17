@@ -14,22 +14,29 @@ export const getAll = async (req, res) => {
 };
 
 export const getOne = async (req, res) => {
-  const game = await Product.findById({
-    _id: req.params.id,
-  });
-  if (!game) {
-    return res.status(404).json({
-      message: "Игра не найдена",
+  try {
+    const game = await Product.findById({
+      _id: req.query.id,
+    });
+    if (!game) {
+      return res.status(404).json({
+        message: "Игра не найдена",
+      });
+    }
+    console.log(game);
+    res.json({
+      _id: game._id,
+      title: game.title,
+      description: game.description,
+      imgURL: game.imgURL,
+      price: game.price,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось получить игру",
     });
   }
-  console.log(game);
-  res.json({
-    _id: game._id,
-    title: game.title,
-    description: game.description,
-    imgURL: game.imgURL,
-    price: game.price,
-  });
 };
 
 export const remove = async (req, res) => {
@@ -100,9 +107,9 @@ export const update = async (req, res) => {
       {
         new: true,
       }
-    )
+    );
     return res.status(200).json({
-      success:true
+      success: true,
     });
   } catch (err) {
     console.log(err);

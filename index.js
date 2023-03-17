@@ -2,9 +2,6 @@ import express from 'express';
 import multer from 'multer';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import session from 'express-session';
-
-
 import {registerValidation, loginValidation, boardGameCreateValidation} from './validations/validations.js';
 import checkAuth from './utils/checkAuth.js';
 import * as UserController from './controllers/UserController.js'
@@ -12,8 +9,6 @@ import * as OrdersController from './controllers/OrdersController.js'
 import * as ProductController from './controllers/ProductController.js'
 import checkAuthAdmin from './utils/checkAuthAdmin.js';
 import handleValidationErrors from './utils/handleValidationErrors.js';
-
-
 
 mongoose
   .connect(
@@ -24,11 +19,6 @@ mongoose
 
 const app = express();
 app.use(cors());
-
-
-
-
-
 
 const storage = multer.diskStorage({
   destination: (_,__,cb)=>{
@@ -61,18 +51,15 @@ app.post('/uploads',checkAuthAdmin,upload.single('image'), (req,res)=>
 });
 
 app.get('/games',ProductController.getAll);
-app.get('/games/:id',ProductController.getOne);
+app.get('/gameOne',ProductController.getOne);
 app.post('/games', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,ProductController.create);
 app.get('/game', checkAuthAdmin,ProductController.remove);
 app.post('/gameEdit', checkAuthAdmin,boardGameCreateValidation,handleValidationErrors,ProductController.update);
-
-
 
 app.get('/addToCart',checkAuth,UserController.addToCart);
 app.get('/removeFromCart',checkAuth,UserController.removeFromCart);
 app.get('/cart',checkAuth,UserController.userCartInfo);
 app.get('/deleteCart',checkAuth,UserController.deleteCart);
-//app.post('/cart',CartGameController.addToCart);
 
 app.get('/addToFavorites',checkAuth,UserController.addToFavorites);
 app.get('/removeFromFavorites',checkAuth,UserController.removeFromFavorites);
@@ -81,10 +68,7 @@ app.get('/deleteFavorite',checkAuth,UserController.deleteFavorite);
 
 app.get('/makeAnOrder',checkAuth,OrdersController.makeAnOrder);
 app.get('/getOrders',checkAuth,OrdersController.getOrdersUser);
-
-
-app.get('/addToOrders',checkAuth,UserController.addToOrders);
-//app.get('/orders',checkAuth,UserController.getOrders);
+app.get('/allOrders',checkAuthAdmin,OrdersController.getAllOrders);
 
 app.listen(5555, (err)=>{
     if(err){
