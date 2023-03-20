@@ -20,19 +20,10 @@ mongoose
 const app = express();
 app.use(cors());
 
-const storage = multer.diskStorage({
-  destination: (_,__,cb)=>{
-    cb(null, "uploads");
-  },
-  filename:(_,file,cb)=>{
-    cb(null, file.originalname);
-  }
-});
 
-const upload = multer({storage});
 
 app.use(express.json());
-app.use('/uploads',express.static('uploads'));
+
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -43,12 +34,6 @@ app.post('/auth/login',loginValidation, handleValidationErrors,UserController.lo
 app.post('/auth/register', registerValidation, handleValidationErrors,UserController.register);
 app.get('/auth/me',checkAuth,UserController.getMe);
 
-app.post('/uploads',checkAuthAdmin,upload.single('image'), (req,res)=>
-{
-  res.json({
-    url: `uploads/${req.file.originalname},`
-  });
-});
 
 app.get('/games',ProductController.getAll);
 app.get('/gameOne',ProductController.getOne);
